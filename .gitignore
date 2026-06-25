@@ -141,3 +141,16 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+
+# Project-specific
+cookies.txt
+headers.txt
+login_result.html
+project_analysis.txt
+reasonix.toml
+*.pptx
+
+# IDE & tools
+.reasonix/
+.playwright-mcp/

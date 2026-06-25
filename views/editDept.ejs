@@ -1,0 +1,10 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>编辑部门</title><link rel="stylesheet" href="/css/style.css?v=2"></head>
+<body class="page">
+<div class="container" style="max-width:520px;margin:36px auto;">
+<div class="topbar"><div class="topbar-title">编辑部门</div></div>
+<form action="/editDept" method="post">
+<input type="hidden" name="dept_id" value="<%= deptInfo.dept_id %>">
+<div class="form-group"><label class="form-label">部门名称</label><input type="text" name="dept_name" class="form-input" value="<%= deptInfo.dept_name %>" required autofocus></div>
+<div class="form-actions"><button type="submit" class="btn btn-accent">保存修改</button><a href="/dept" class="btn btn-outline">返回</a></div></form></div></body></html>

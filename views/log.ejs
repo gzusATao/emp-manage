@@ -1,0 +1,14 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>操作日志</title><link rel="stylesheet" href="/css/style.css?v=2"></head>
+<body class="page">
+<div class="container">
+<div class="topbar"><div class="topbar-title">操作日志</div><div class="topbar-actions"><a href="/" class="btn btn-outline">返回仪表盘</a></div></div>
+<div class="table-shell"><table><thead><tr><th>时间</th><th>操作人</th><th>操作</th><th>对象</th><th>详情</th></tr></thead><tbody>
+<% if(logs.length === 0) { %><tr><td colspan="5" class="cell-empty">暂无操作记录</td></tr><% } else { %>
+<% logs.forEach(function(l) { %><tr>
+<td style="font-size:.8rem;"><%= new Date(l.created_at).toLocaleString('zh-CN') %></td><td><%= l.username %></td>
+<td><% if (l.action.includes('添加')) { %><span style="color:var(--teal);font-weight:500;">+ <%= l.action %></span><% } else if (l.action.includes('编辑')) { %><span style="color:#818CF8;font-weight:500;">✎ <%= l.action %></span><% } else { %><span style="color:var(--alert);font-weight:500;">✕ <%= l.action %></span><% } %></td>
+<td><%= l.target %></td><td style="font-size:.8rem;color:var(--mute);"><%= l.detail || '-' %></td></tr>
+<% }) %><% } %></tbody></table></div>
+<div class="pagination"><% if(page > 1) { %><a href="?page=1">首页</a><a href="?page=<%= page-1 %>">上一页</a><% } %><span>第 <%= page %> / <%= maxPage %> 页</span><% if(page < maxPage) { %><a href="?page=<%= page+1 %>">下一页</a><a href="?page=<%= maxPage %>">尾页</a><% } %></div></div></body></html>

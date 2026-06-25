@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>部门管理</title><link rel="stylesheet" href="/css/style.css?v=2"></head>
+<body class="page">
+<div class="container">
+<div class="topbar"><div class="topbar-title">部门管理</div><div class="topbar-actions"><a href="/" class="btn btn-outline">仪表盘</a><a href="/emp" class="btn btn-primary">员工列表</a><span class="topbar-user"><%= user.username %></span></div></div>
+<% if (user.role === 'admin') { %>
+<div class="add-bar"><form action="/addDept" method="post" style="display:flex;gap:12px;align-items:center;width:100%;"><input type="text" name="dept_name" class="form-input" placeholder="输入新部门名称..." required><button type="submit" class="btn btn-success">添加部门</button></form></div>
+<% } %>
+<div class="table-shell"><table><thead><tr><th>部门 ID</th><th>部门名称</th><th>员工人数</th><th>操作</th></tr></thead><tbody>
+<% if(deptList.length === 0) { %><tr><td colspan="4" class="cell-empty">暂无部门数据</td></tr>
+<% } else { deptList.forEach(function(item) { %><tr>
+<td><%= item.dept_id %></td><td><strong><%= item.dept_name %></strong></td><td><%= item.cnt %> 人</td>
+<td class="cell-actions">
+<% if (user.role === 'admin') { %>
+<a href="/editDept?id=<%= item.dept_id %>" class="btn btn-outline" style="padding:4px 10px;font-size:.8rem;">编辑</a>
+<% if (item.cnt === 0) { %><a href="/delDept?id=<%= item.dept_id %>" class="btn btn-danger-sm" onclick="return confirm('确定删除该部门？')">删除</a>
+<% } else { %><button class="btn btn-outline" style="padding:4px 10px;font-size:.8rem;opacity:.5;cursor:not-allowed;" disabled title="该部门下还有员工">删除</button><% } %>
+<% } else { %><span style="color:var(--mute);font-size:.8rem;">只读</span><% } %></td></tr>
+<% }) } %></tbody></table></div></div></body></html>

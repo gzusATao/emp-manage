@@ -1,0 +1,27 @@
+{
+  "name": "emp-manage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "postinstall": "node -e \"const fs=require('fs');fs.mkdirSync('public/js',{recursive:true});fs.copyFileSync('node_modules/three/build/three.module.js','public/js/three.module.js');fs.copyFileSync('node_modules/three/build/three.core.js','public/js/three.core.js');fs.copyFileSync('node_modules/three/build/three.core.min.js','public/js/three.core.min.js');console.log('Three.js copied to public/js/')\"",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.3.0",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.2.0",
+    "mysql2": "^3.22.5",
+    "pptxgenjs": "^4.0.1",
+    "three": "^0.184.0",
+    "xlsx": "^0.18.5"
+  }
+}

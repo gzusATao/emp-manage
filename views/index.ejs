@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>员工管理</title>
+<link rel="stylesheet" href="/css/style.css?v=2">
+</head>
+<body class="page">
+<div class="container">
+<div class="topbar">
+<div class="topbar-title">员工管理</div>
+<div class="topbar-actions">
+<a href="/" class="btn btn-outline">仪表盘</a>
+<span class="topbar-user"><%= user.username %></span>
+<a href="/changePwd" class="btn btn-outline">修改密码</a>
+<a href="/logout" class="btn btn-outline">退出登录</a>
+</div></div>
+<div class="search-bar">
+<label>搜索</label>
+<form action="/emp" method="get" id="searchForm" style="display:flex;gap:10px;align-items:center;">
+<input type="hidden" name="order" value="<%= order %>"><input type="hidden" name="sort" value="<%= sort %>">
+<input type="text" name="search" class="form-input" value="<%= search %>" placeholder="搜索员工姓名...">
+<button type="submit" class="btn btn-primary">搜索</button></form>
+<div class="spacer"></div>
+<% if (user.role === 'admin') { %>
+<button id="batchDelOpen" class="btn btn-danger">批量删除</button>
+<a href="/addEmp" class="btn btn-success">添加员工</a>
+<a href="/importEmp" class="btn btn-outline">导入</a>
+<% } %>
+<a href="/dept" class="btn btn-accent">部门管理</a>
+</div>
+<div class="table-shell"><table><thead><tr>
+<th class="cell-check"><input type="checkbox" id="checkAll"></th>
+<th><a href="?order=emp_id&sort=<%= sort==='asc'?'desc':'asc' %>&search=<%= search %>">工号 ↕</a></th>
+<th><a href="?order=emp_name&sort=<%= sort==='asc'?'desc':'asc' %>&search=<%= search %>">姓名 ↕</a></th>
+<th><a href="?order=emp_dept_id&sort=<%= sort==='asc'?'desc':'asc' %>&search=<%= search %>">部门 ↕</a></th>
+<th><a href="?order=emp_birth&sort=<%= sort==='asc'?'desc':'asc' %>&search=<%= search %>">出生日期 ↕</a></th>
+<th><a href="?order=emp_entry&sort=<%= sort==='asc'?'desc':'asc' %>&search=<%= search %>">入职时间 ↕</a></th>
+<th><a href="?order=emp_salary&sort=<%= sort==='asc'?'desc':'asc' %>&search=<%= search %>">月薪 ↕</a></th>
+<th>职位</th><th>手机</th><th>操作</th></tr></thead>
+<tbody id="tableBody">
+<% if(empList.length === 0) { %><tr><td colspan="10" class="cell-empty">暂无员工数据，点击「添加员工」开始</td></tr>
+<% } else { empList.forEach(item => { %>
+<tr><td class="cell-check"><input class="emp-checkbox" type="checkbox" data-id="<%= item.emp_id %>"></td>
+<td><%= item.emp_id %></td><td><strong><%= item.emp_name %></strong></td>
+<td><span class="badge-dept"><%= item.dept_name %></span></td>
+<td><%= item.emp_birth ? new Date(item.emp_birth).toLocaleDateString() : '-' %></td>
+<td><%= item.emp_entry ? new Date(item.emp_entry).toLocaleDateString() : '-' %></td>
+<td style="color:#2DD4BF;font-weight:500;"><%= item.emp_salary ? '¥' + Number(item.emp_salary).toLocaleString() : '-' %></td>
+<td><%= item.emp_position || '-' %></td>
+<td style="font-size:.8rem;"><%= item.emp_phone || '-' %></td>
+<td class="cell-actions">
+<% if (user.role === 'admin') { %>
+<a href="/editEmp?id=<%= item.emp_id %>&search=<%= search %>&order=<%= order %>&sort=<%= sort %>" class="btn btn-outline" style="padding:4px 10px;font-size:.8rem;">编辑</a>
+<button class="btn btn-danger-sm single-del" data-id="<%= item.emp_id %>">删除</button>
+<% } else { %><span style="color:var(--mute);font-size:.8rem;">只读</span><% } %></td></tr>
+<% }) } %></tbody></table></div>
+<div class="pagination">
+<% if(page > 1) { %><a href="?page=1&search=<%= search %>&order=<%= order %>&sort=<%= sort %>">首页</a><a href="?page=<%= page-1 %>&search=<%= search %>&order=<%= order %>&sort=<%= sort %>">上一页</a><% } %>
+<span>第 <%= page %> / <%= maxPage %> 页</span>
+<% if(page < maxPage) { %><a href="?page=<%= page+1 %>&search=<%= search %>&order=<%= order %>&sort=<%= sort %>">下一页</a><a href="?page=<%= maxPage %>&search=<%= search %>&order=<%= order %>&sort=<%= sort %>">尾页</a><% } %></div></div>
+
+<div class="mask" id="delMask"><div class="modal">
+<div class="modal-title"><span class="warn">⚠</span> 确认删除</div>
+<div class="modal-desc" id="maskTip">删除后数据无法恢复，确定继续？</div>
+<input type="hidden" id="delTargetIds">
+<div class="modal-actions"><button class="btn btn-outline" id="cancelDel">取消</button><button class="btn btn-danger" id="confirmDel">确认删除</button></div></div></div>
+
+<script>
+var mask=document.getElementById('delMask'),maskTip=document.getElementById('maskTip'),delIdsInput=document.getElementById('delTargetIds');
+var checkAll=document.getElementById('checkAll'),checkboxList=document.querySelectorAll('.emp-checkbox');
+var batchOpenBtn=document.getElementById('batchDelOpen'),cancelBtn=document.getElementById('cancelDel'),confirmBtn=document.getElementById('confirmDel');
+var singleDelBtns=document.querySelectorAll('.single-del');
+cancelBtn.onclick=function(){mask.style.display='none'};
+checkAll.onchange=function(){checkboxList.forEach(function(cb){cb.checked=checkAll.checked})};
+document.getElementById('tableBody').addEventListener('change',function(e){if(e.target.classList.contains('emp-checkbox')){checkAll.checked=Array.from(checkboxList).every(function(cb){return cb.checked})}});
+singleDelBtns.forEach(function(btn){btn.onclick=function(){delIdsInput.value=btn.dataset.id;maskTip.innerText='确定删除该员工？';mask.style.display='flex'}});
+batchOpenBtn.onclick=function(){var s=Array.from(checkboxList).filter(function(cb){return cb.checked});if(s.length===0){alert('请先勾选需要删除的员工');return}delIdsInput.value=s.map(function(cb){return cb.dataset.id}).join(',');maskTip.innerText='已选中 '+s.length+' 名员工，确认执行？';mask.style.display='flex'};
+confirmBtn.onclick=async function(){var ids=delIdsInput.value;confirmBtn.disabled=true;confirmBtn.innerText='删除中...';try{var res=await fetch('/batchDelEmp',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'ids='+ids});var data=await res.json();if(data.code===0)location.reload();else{alert(data.msg);mask.style.display='none'}}catch(err){alert('网络请求失败')}finally{confirmBtn.disabled=false;confirmBtn.innerText='确认删除'}};
+</script>
+</body>
+</html>

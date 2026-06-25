@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>仪表盘 - 员工管理系统</title>
+  <link rel="stylesheet" href="/css/style.css?v=2">
+</head>
+<body class="page">
+  <div class="container">
+    <div class="topbar">
+      <div class="topbar-title">仪表盘</div>
+      <div class="topbar-actions">
+        <a href="/emp" class="btn btn-primary">员工管理</a>
+        <a href="/dept" class="btn btn-accent">部门管理</a>
+        <a href="/log" class="btn btn-outline">日志</a>
+        <% if (user.role === 'admin') { %>
+        <a href="/users" class="btn btn-outline">用户</a>
+        <% } %>
+        <span class="topbar-user"><%= user.username %></span>
+        <a href="/changePwd" class="btn btn-outline">修改密码</a>
+        <a href="/logout" class="btn btn-outline">退出登录</a>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-icon"></div><div class="stat-number"><%= stats.totalEmp %></div><div class="stat-label">在职员工</div></div>
+      <div class="stat-card"><div class="stat-icon"></div><div class="stat-number"><%= stats.totalDept %></div><div class="stat-label">部门总数</div></div>
+      <div class="stat-card"><div class="stat-icon"></div><div class="stat-number"><%= stats.monthNew %></div><div class="stat-label">新入职</div></div>
+      <div class="stat-card"><div class="stat-icon"></div><div class="stat-number"><%= stats.totalSalary %></div><div class="stat-label">月薪总额</div></div>
+    </div>
+
+    <div class="panels-row">
+      <div>
+      <div class="panel">
+        <div class="panel-head">各部门人数</div>
+        <% if (deptStat.length === 0) { %><div class="empty-state">暂无部门数据</div><% } else {
+          const colors = ['#6366F1','#2DD4BF','#818CF8','#FBBF24','#F87171','#34D399','#A78BFA','#F472B6'];
+          const maxCnt = Math.max(...deptStat.map(d => d.cnt), 1);
+          deptStat.forEach((d, i) => { const pct = Math.round(d.cnt / maxCnt * 100); %>
+          <div class="dept-bar-row">
+            <div class="dept-bar-label"><%= d.dept_name %></div>
+            <div class="dept-bar-track"><div class="dept-bar-fill" style="width:<%= pct %>%; background:<%= colors[i % colors.length] %>"><% if (pct > 30) { %><%= d.cnt %> 人<% } %></div></div>
+            <div class="dept-bar-count"><%= d.cnt %>人</div>
+          </div>
+        <% }) } %>
+      </div>
+
+      <% if (user.role === 'admin') { %>
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-head">快捷操作</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <a href="/addEmp" class="btn btn-primary" style="justify-content:center;padding:12px;">添加员工</a>
+          <a href="/importEmp" class="btn btn-outline" style="justify-content:center;padding:12px;">导入 Excel</a>
+          <a href="/exportEmp" class="btn btn-outline" style="justify-content:center;padding:12px;">导出 CSV</a>
+          <a href="/dept" class="btn btn-outline" style="justify-content:center;padding:12px;">部门管理</a>
+        </div>
+      </div>
+      <% } %>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">本月入职（<%= stats.monthNew %>人）<a href="/emp?startDate=<%= firstDay %>" style="float:right;font-size:.75rem;color:var(--indigo);text-transform:none;letter-spacing:0;font-weight:400;">查看全部 &rarr;</a></div>
+        <% if (monthEmps.length === 0) { %><div class="empty-state">本月暂无新员工入职</div><% } else { %>
+          <% monthEmps.forEach(function(emp) { %>
+            <div class="recent-item">
+              <div class="recent-avatar"><%= emp.emp_name.charAt(0) %></div>
+              <div class="recent-body">
+                <div class="recent-name"><%= emp.emp_name %></div>
+                <div class="recent-meta"><%= emp.dept_name || '未分配' %><% if (emp.emp_entry) { %> · <%= new Date(emp.emp_entry).toLocaleDateString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit'}) %><% } %></div>
+              </div>
+              <% if (emp.emp_salary) { %><div class="recent-salary">¥<%= Number(emp.emp_salary).toLocaleString() %></div><% } %>
+            </div>
+          <% }) %>
+          <% if (monthMaxPage > 1) { %>
+          <div style="display:flex;justify-content:center;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04);">
+            <% if (monthPage > 1) { %><a href="?mp=1" style="padding:4px 10px;border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:.75rem;color:var(--graphite);">首页</a><a href="?mp=<%= monthPage-1 %>" style="padding:4px 10px;border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:.75rem;color:var(--graphite);">‹</a><% } %>
+            <span style="padding:4px 10px;font-size:.75rem;color:var(--mute);"><%= monthPage %>/<%= monthMaxPage %></span>
+            <% if (monthPage < monthMaxPage) { %><a href="?mp=<%= monthPage+1 %>" style="padding:4px 10px;border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:.75rem;color:var(--graphite);">›</a><a href="?mp=<%= monthMaxPage %>" style="padding:4px 10px;border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:.75rem;color:var(--graphite);">末页</a><% } %>
+          </div>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

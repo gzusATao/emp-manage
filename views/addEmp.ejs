@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>添加员工</title><link rel="stylesheet" href="/css/style.css?v=2"></head>
+<body class="page">
+<div class="container" style="max-width:520px;margin:36px auto;">
+<div class="topbar"><div class="topbar-title">添加新员工</div></div>
+<form action="/addEmp" method="post">
+<div class="form-group"><label class="form-label">姓名</label><input type="text" name="emp_name" class="form-input" placeholder="员工姓名" required autofocus></div>
+<div class="form-group"><label class="form-label">部门</label><select name="emp_dept_id" class="form-select" required><option value="">请选择部门</option><% deptList.forEach(function(item) { %><option value="<%= item.dept_id %>"><%= item.dept_name %></option><% }) %></select></div>
+<div class="form-group"><label class="form-label">出生日期</label><input type="date" name="emp_birth" class="form-input"></div>
+<div class="form-group"><label class="form-label">入职时间</label><input type="date" name="emp_entry" class="form-input"></div>
+<div class="form-group"><label class="form-label">月薪（元）</label><input type="number" name="emp_salary" class="form-input" step="0.01" min="0" placeholder="例如：8000"></div>
+<div class="form-group"><label class="form-label">手机号</label><input type="text" name="emp_phone" class="form-input" placeholder="手机号码"></div>
+<div class="form-group"><label class="form-label">邮箱</label><input type="email" name="emp_email" class="form-input" placeholder="email@company.com"></div>
+<div class="form-group"><label class="form-label">性别</label><select name="emp_gender" class="form-select"><option value="">请选择</option><option value="男">男</option><option value="女">女</option></select></div>
+<div class="form-group"><label class="form-label">职位</label><input type="text" name="emp_position" class="form-input" placeholder="例如：前端工程师"></div>
+<div class="form-actions"><button type="submit" class="btn btn-primary">确认添加</button><a href="/emp" class="btn btn-outline">返回列表</a></div></form></div></body></html>
